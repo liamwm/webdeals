@@ -9,9 +9,28 @@ const getStuff = async (req, res) => {
   //
   // const products = await fetchProducts(page, url)
 
-  //const url = "https://www.jbhifi.com.au/sitemap_collections_1.xml"
-  const url = "https://www.jbhifi.com.au/sitemap_products_1.xml?from=1614257324130&to=1618968379490"
-  const products = await crawlSite(page, url)
+  const root = "https://www.jbhifi.com.au/sitemap.xml"
+  // get every loc that starts with https://www.jbhifi.com.au/sitemap_products
+  const regex = /^https:\/\/www.jbhifi.com.au\/sitemap_products/g
+
+  const urlSelector = "sitemap > loc"
+  await page.goto(root)
+  const f = (el) => el.textContent
+  const urls = await fetchValues(page, urlSelector, f)
+  for (url of urls) {
+    //url.replace("&amp;", "&")
+    console.log(url)
+  }
+
+  const toCrawl = []
+  // want to crawl only certain locations
+  // for (url of urls) {
+  //   if (regex.test(url)) {
+  //     const new_prods = await crawlSite(page, url)
+  //     products.push(new_prods)
+  //   }
+  // }
+  const products = await crawlSite(page, urls[0])
 
   res.send(products)
 }
@@ -74,6 +93,28 @@ const fetchAttribute = async (page, selector, pageFunction) => {
   if (attr) {console.log(attr)}
   return attr
 }
+
+const fetchValues = async (page, selector, pageFunction) => {
+  // Wait for page to load desired element
+  await page.waitForSelector(selector).catch((err) => {
+    console.log("Selector " + selector + " not found")
+  })
+  // Retrieve the desired info from elements
+  const func = (els, f) => els.map(
+    el => {
+      const func = eval(f)
+      return func(el)
+    }
+  )
+  const values = await page.$$eval(selector, func, pageFunction.toString()).catch((err) => {
+    console.log("No value retrieved for selector " + selector)
+    console.log(err)
+  })
+
+  //console.log(values)
+  return values
+}
+
 
 
 module.exports = {getStuff}

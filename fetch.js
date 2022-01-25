@@ -1,6 +1,8 @@
 const puppeteer = require("puppeteer")
+const mongoose = require("mongoose")
+const Product = require("./models/product.js")
 
-const MAX_PRODS = 5
+const MAX_PRODS = 1
 
 const getStuff = async (req, res) => {
   const browser = await puppeteer.launch({headless: false});
@@ -31,6 +33,11 @@ const getStuff = async (req, res) => {
   //   }
   // }
   const products = await crawlSite(page, urls[0])
+
+  for (product of products) {
+    const prodRecord = new Product(product)
+    await prodRecord.save().catch("Save error")
+  }
 
   res.send(products)
 }

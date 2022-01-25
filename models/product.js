@@ -5,11 +5,7 @@ const productSchema = new mongoose.Schema({
   price: String,
   img: String,
   link: String,
-  seller: {
-    type: Schema.Types.ObjectID,
-    ref: "Seller"
-  }
 })
 
-const productModel = mongoose.Model("Product", productSchema)
+const productModel = mongoose.model("Product", productSchema)
 module.exports = productModel

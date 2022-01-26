@@ -12,13 +12,17 @@ mongoose.connection.on("error", (err) => console.log(err))
 
 const fetchController = require("./fetch.js")
 
+const Product = require("./models/product.js")
+
 
 const app = express()
 const PORT = 3000 || process.env.PORT
 
-
+app.set("view engine", "pug")
 app.get("/", async (req, res) => {
-  res.send("Hello world")
+  const products = await Product.find({}).lean()
+  console.log(typeof(products))
+  res.render("index", {products: products})
 })
 app.get("/fetch", fetchController.getStuff)
 

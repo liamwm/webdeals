@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer")
 const mongoose = require("mongoose")
 const Product = require("./models/product.js")
 
-const MAX_PRODS = 1
+const MAX_PRODS = 100
 
 const getStuff = async (req, res) => {
   const browser = await puppeteer.launch({headless: false});
@@ -32,12 +32,14 @@ const getStuff = async (req, res) => {
   //     products.push(new_prods)
   //   }
   // }
-  const products = await crawlSite(page, urls[0])
+  const products = []
+  for (url of urls) {
+    const newProds = await crawlSite(page, url)
 
-  for (product of products) {
-    const prodRecord = new Product(product)
-    await prodRecord.save().catch("Save error")
+    products.push(newProds)
   }
+
+
 
   res.send(products)
 }
@@ -69,6 +71,7 @@ const crawlSite = async (page, url) => {
 }
 
 const fetchProduct = async (page, url) => {
+  //console.time("timer")
   await page.goto(url);
   console.log(url)
 
@@ -80,7 +83,11 @@ const fetchProduct = async (page, url) => {
   const price = await fetchAttribute(page, priceSelector, (el)=>el.content)
   const img = await fetchAttribute(page, imgSelector, (el)=>el.src)
 
-  return {"name": name, "price": price, "img": img, "url": url}
+  const product = {"name": name, "price": price, "img": img, "url": url}
+  const prodRecord = new Product(product)
+  //await prodRecord.save().catch("Save error")
+  //console.timeEnd("timer")
+  return product
 }
 
 const removeTags = (htmlStr) => {

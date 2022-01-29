@@ -12,19 +12,18 @@ mongoose.connection.on("error", (err) => console.log(err))
 
 const fetchController = require("./fetch.js")
 
-const Product = require("./models/product.js")
-
 
 const app = express()
 const PORT = 3000 || process.env.PORT
 
 app.set("view engine", "pug")
 app.get("/", async (req, res) => {
-  const products = await Product.find({}).lean()
-  console.log(typeof(products))
-  res.render("index", {products: products})
+  res.render("index")
 })
 app.get("/fetch", fetchController.getStuff)
+
+const productsRouter = require("./routes/productsRouter.js")
+app.use("/products", productsRouter)
 
 app.listen(PORT, () => {
   console.log("App listening on port " + PORT)

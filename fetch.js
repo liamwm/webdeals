@@ -5,7 +5,7 @@ const Product = require("./models/product.js")
 const MAX_PRODS = 100
 
 const getStuff = async (req, res) => {
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   // const url = 'https://www.jbhifi.com.au/collections/computers-tablets/student-laptops'
   //
@@ -24,20 +24,20 @@ const getStuff = async (req, res) => {
     console.log(url)
   }
 
-  const toCrawl = []
-  // want to crawl only certain locations
-  // for (url of urls) {
-  //   if (regex.test(url)) {
-  //     const new_prods = await crawlSite(page, url)
-  //     products.push(new_prods)
-  //   }
-  // }
   const products = []
+  // want to crawl only certain locations
   for (url of urls) {
-    const newProds = await crawlSite(page, url)
-
-    products.push(newProds)
+    if (regex.test(url)) {
+      const newProds = await crawlSite(page, url)
+      products.push(newProds)
+    }
   }
+
+  // for (url of urls) {
+  //   const newProds = await crawlSite(page, url)
+  //
+  //   products.push(newProds)
+  // }
 
 
 
@@ -78,14 +78,16 @@ const fetchProduct = async (page, url) => {
   const nameSelector = "h1[itemprop=name]"
   const priceSelector = "meta[itemprop=price]"
   const imgSelector = "img"
+  const descSelector = "description"
 
   const name = await fetchAttribute(page, nameSelector, (el)=>el.innerHTML)
   const price = await fetchAttribute(page, priceSelector, (el)=>el.content)
   const img = await fetchAttribute(page, imgSelector, (el)=>el.src)
+  const desc = await fetch
 
   const product = {"name": name, "price": price, "img": img, "url": url}
   const prodRecord = new Product(product)
-  //await prodRecord.save().catch("Save error")
+  prodRecord.save().catch("Save error")
   //console.timeEnd("timer")
   return product
 }

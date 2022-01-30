@@ -1,14 +1,14 @@
 const express = require("express")
-const mongoose = require("mongoose")
+
+
+const productsController = require("../controllers/productsController.js")
 
 const router = express.Router()
 
-const Product = require("../models/product.js")
 
-router.get("/", async (req, res) => {
-  const products = await Product.find({}).lean()
-  console.log(typeof(products))
-  res.render("products", {products: products})
-})
+
+router.get("/", productsController.getProducts)
+//router.get("?query=:query", productsController.searchProducts)
+
 
 module.exports = router

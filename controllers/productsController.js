@@ -15,7 +15,7 @@ const getProducts = async (req, res) => {
     products = await Product.find({}).lean()
   }
 
-  res.render("products", {products: products})
+  res.render("products", {products: products, searchValue: query})
 
 
 }

@@ -4,7 +4,8 @@ const Product = require("./models/product.js")
 
 const MAX_PRODS = 100
 
-const getStuff = async (req, res) => {
+const getStuff = async () => {
+  console.log("Launching puppeteer...")
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   // const url = 'https://www.jbhifi.com.au/collections/computers-tablets/student-laptops'
